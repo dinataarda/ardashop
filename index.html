@@ -8,439 +8,106 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         :root {
-            /* TEMA UNGU ARDASHOP */
-            --primary: #4A0E4E; /* Ungu gelap dari header */
-            --accent: #F39C12; /* Kuning/Emas buat icon & harga sorotan */
-            --wa-green: #2ECC71; /* Hijau tombol WA */
-            
+            --primary: #5A7C50; /* Matcha Green */
+            --accent: #E5733A; /* Orange Pelatuk */
+            --wa-green: #2ECC71;
             --bg-body: #F4F6F9;
             --bg-surface: #FFFFFF;
-            --text-dark: #222222;
-            --text-muted: #757575;
-            --border: #EAEAEA;
+            --text-dark: #2A3128;
+            --text-muted: #73806E;
+            --border: #E2E6DF;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-dark); max-width: 480px; margin: 0 auto; padding-bottom: 70px; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        
-        body { background-color: var(--bg-body); color: var(--text-dark); max-width: 480px; margin: 0 auto; padding-bottom: 70px; position: relative; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
-
-        /* Header Ungu */
-        .header { background: var(--primary); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 10px rgba(74, 14, 78, 0.3); }
-        .logo-text { color: #fff; font-weight: 900; font-size: 1.2rem; font-style: italic; letter-spacing: 0.5px; display: flex; flex-direction: column; line-height: 1; }
-        .logo-text span { font-size: 0.6rem; color: var(--accent); font-weight: normal; font-style: normal; margin-top: 2px; }
-        
+        /* Header */
+        .header { background: var(--primary); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(90, 124, 80, 0.2); }
+        .logo-text { color: #fff; font-weight: 900; font-size: 1.2rem; font-style: italic; }
         .search-bar { flex: 1; background: #fff; padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; }
-        .search-bar i { color: var(--accent); font-size: 1rem; }
-        
-        .header-icon { color: #fff; font-size: 1.3rem; position: relative; cursor: pointer; margin-left: 5px; }
+        .header-icon { color: #fff; font-size: 1.3rem; position: relative; cursor: pointer; }
         .cart-badge { position: absolute; top: -6px; right: -8px; background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: bold; padding: 2px 6px; border-radius: 10px; border: 2px solid var(--primary); }
 
-        /* Banner */
-        .banner-container { width: 100%; padding: 10px 15px; background: #fff; }
-        .banner-img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        /* Banner Slider */
+        .banner-wrapper { padding: 10px 15px; background: var(--bg-surface); }
+        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; scrollbar-width: none; scroll-behavior: smooth; }
+        .banner-slider::-webkit-scrollbar { display: none; }
+        .banner-slide { flex: 0 0 100%; scroll-snap-align: center; height: 160px; border-radius: 12px; padding: 15px 20px; display: flex; flex-direction: column; justify-content: center; color: #fff; position: relative; overflow: hidden; }
+        .bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; mix-blend-mode: multiply; }
+        .slide-content { position: relative; z-index: 2; }
+        .geser-hint { position: absolute; bottom: 10px; right: 15px; background: rgba(0,0,0,0.3); color: #fff; font-size: 0.6rem; padding: 3px 8px; border-radius: 10px; backdrop-filter: blur(2px); }
 
-        /* Kategori Kapsul */
-        .category-grid { background: var(--bg-surface); padding: 5px 15px 15px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
-        .category-grid::-webkit-scrollbar { display: none; }
-        .cat-item { display: flex; align-items: center; gap: 6px; padding: 8px 15px; background: #f8f9fa; border-radius: 20px; border: 1px solid #eee; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-        .cat-item i { color: var(--primary); font-size: 1.1rem; }
-        .cat-item.active { background: rgba(74, 14, 78, 0.1); border-color: var(--primary); font-weight: bold; }
-        .cat-name { font-size: 0.8rem; color: var(--text-dark); }
+        /* Kategori Tengah */
+        .category-grid { background: var(--bg-surface); padding: 10px 15px 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
+        .cat-item { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f8f9fa; border-radius: 30px; border: 1px solid #eee; cursor: pointer; }
+        .cat-item.active { background: rgba(90, 124, 80, 0.1); border-color: var(--primary); color: var(--primary); font-weight: bold; }
+        .cat-name { font-size: 0.8rem; font-weight: 600; }
 
-        /* Grid Dagangan Premium */
-        .section-title { padding: 20px 15px 10px; font-weight: 800; font-size: 1.1rem; color: var(--text-dark); }
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px 15px; }
-        
-        .card { background: var(--bg-surface); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.02); transition: 0.2s; }
-        .card:active { transform: scale(0.98); }
-        .card-img { width: 100%; height: 160px; object-fit: cover; background: #f9f9f9; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-        
-        .card-body { padding: 12px; display: flex; flex-direction: column; flex: 1; }
-        .card-title { font-size: 0.85rem; font-weight: 600; line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 6px; color: #333; cursor: pointer; }
-        .card-price { color: var(--primary); font-weight: 900; font-size: 1.05rem; margin-bottom: 10px; }
-        
-        /* Tombol Hijau WA */
-        .btn-add-cart { width: 100%; padding: 10px; margin-top: auto; background: var(--wa-green); color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2); }
-        .btn-add-cart:active { background: #27ae60; }
-        .btn-habis { background: #ccc; box-shadow: none; cursor: not-allowed; color: #666; }
-
-        /* Modal Keranjang (Standard) */
-        #cart-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: flex-end; backdrop-filter: blur(2px); }
-        .cart-content { background: #fff; width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 25px 20px; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .cart-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 20px; font-size: 1.2rem; color: var(--primary); }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
-        .cart-total { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin: 20px 0; text-align: right; border-top: 2px dashed #eee; padding-top: 15px; }
-        .btn-checkout { background: var(--wa-green); color: #fff; width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 1.05rem; cursor: pointer; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
-
-        /* =========================================
-           MODAL DETAIL PRODUK (DARK MODE MEWAH) 
-           ========================================= */
-        #detail-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
-        
-        .detail-card { background: #1F1529; /* Ungu super gelap */ width: 100%; max-width: 440px; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: zoomIn 0.2s ease; border: 1px solid rgba(255,255,255,0.1); }
-        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .detail-header-dark { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .detail-header-dark .logo-mini { color: #fff; font-weight: bold; font-size: 0.9rem; font-style: italic; display: flex; align-items: center; gap: 5px; }
-        .detail-header-dark .logo-mini i { color: var(--accent); }
-        
-        .detail-scroll-area { overflow-y: auto; padding-bottom: 20px; }
-        .detail-main-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: #000; }
-        
-        .thumbnail-container { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(0,0,0,0.2); }
-        .thumbnail { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 2px solid transparent; cursor: pointer; opacity: 0.6; transition: 0.2s; }
-        .thumbnail.active { border-color: var(--accent); opacity: 1; }
-        
-        .detail-info { padding: 20px; color: #fff; }
-        .detail-title { font-size: 1.3rem; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
-        .detail-price { color: var(--primary); /* Buat kasih efek glow kuning, kita override di bawah */ color: #C68BFF; font-size: 1.4rem; font-weight: 900; margin-bottom: 20px; }
-        
-        .variant-title { font-size: 0.75rem; font-weight: 600; color: #9A8C98; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .chip-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-        .chip { border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; background: transparent; color: #ddd; }
-        .chip.active { background: rgba(243, 156, 18, 0.1); color: var(--accent); border-color: var(--accent); font-weight: bold; }
-        
-        .desc-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; font-size: 0.85rem; line-height: 1.6; color: #E0E0E0; white-space: pre-wrap; border: 1px solid rgba(255,255,255,0.05); }
-        
-        .detail-footer { padding: 15px 20px 20px; background: #1F1529; border-top: 1px solid rgba(255,255,255,0.05); }
-        .btn-add-detail { width: 100%; background: var(--wa-green); color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); }
-
-        /* Toast Notifikasi */
-        #toast { visibility: hidden; min-width: 250px; background-color: var(--primary); color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed; z-index: 2000; left: 50%; bottom: 80px; transform: translateX(-50%); font-size: 0.9rem; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.3s 2.5s; }
-        @keyframes fadein { from { bottom: 50px; opacity: 0; } to { bottom: 80px; opacity: 1; } }
-        @keyframes fadeout { from { bottom: 80px; opacity: 1; } to { bottom: 50px; opacity: 0; } }
-        
-        #loading-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        /* Produk Grid */
+        .section-title { padding: 20px 15px 10px; font-weight: 800; color: var(--text-dark); }
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .card-img { width: 100%; height: 160px; object-fit: cover; }
+        .card-body { padding: 12px; }
+        .card-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+        .card-price { color: var(--accent); font-weight: 900; font-size: 1rem; margin-bottom: 10px; }
+        .btn-add-cart { width: 100%; padding: 10px; background: var(--wa-green); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo-text">
-            ArdaShop.
-            <span>Online E-commerce</span>
-        </div>
-        <div class="search-bar" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
-            <span>Cari Sesuatu...</span>
-            <i class="fas fa-search"></i>
-        </div>
-        <div class="header-icon" onclick="toggleCart()">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="cart-badge" id="cart-count">0</span>
-        </div>
+        <div class="logo-text">ArdaShop.</div>
+        <div class="search-bar"><span>Cari Sesuatu...</span><i class="fas fa-search"></i></div>
+        <div class="header-icon" onclick="toggleCart()"><i class="fas fa-shopping-cart"></i><span class="cart-badge" id="cart-count">0</span></div>
     </div>
 
-    <div class="banner-container">
-        <img src="https://via.placeholder.com/480x130/4A0E4E/ffffff?text=ADATA+Grosir+%7C+Harga+Gudang" class="banner-img" alt="Promo">
+    <div class="banner-wrapper">
+        <div class="banner-slider">
+            <div class="banner-slide" style="background: linear-gradient(135deg, #5A7C50, #739568);">
+                <div class="slide-content">
+                    <h2 style="font-size: 1.2rem;">ArdaShop Grosir | Harga Menarik</h2>
+                    <p style="font-size: 0.8rem;">Sembako, Elektronik, Furniture, Lengkap!</p>
+                </div>
+            </div>
+            <div class="banner-slide" style="background: linear-gradient(135deg, #E5733A, #F39C12);">
+                <div class="slide-content">
+                    <h2 style="font-size: 1.2rem;">Toserba digital Desa</h2>
+                    <p style="font-size: 0.8rem;">COD sekecamatan & sekitarnya</p>
+                    <p style="font-size: 0.8rem;">Bayar saat sampai di tempat</p>
+                </div>
+            </div>
+            <div class="banner-slide" style="background: linear-gradient(135deg, #2A3128, #4A5D44);">
+                <div class="slide-content">
+                    <h2 style="font-size: 1.2rem;">Pengantaran Barang</h2>
+                    <p style="font-size: 0.8rem;">Di antar sesuai lokasi dengan nyaman, aman.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="category-grid" id="category-container"></div>
-    
-    <div id="loading-state"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Menarik stok dari gudang...</div>
-    <div class="product-grid" id="product-grid" style="display: none;"></div>
-
-    <div id="cart-modal">
-        <div class="cart-content">
-            <div class="cart-header">
-                <span>Keranjang Anda</span>
-                <i class="fas fa-times" onclick="toggleCart()" style="cursor:pointer; color: #888;"></i>
-            </div>
-            <div id="cart-items-list"></div>
-            <div class="cart-total">Total: Rp <span id="cart-total-price">0</span></div>
-            <button class="btn-checkout" onclick="checkoutWA()"><i class="fab fa-whatsapp"></i> Checkout via WhatsApp</button>
-        </div>
-    </div>
-
-    <div id="detail-modal">
-        <div class="detail-card">
-            <div class="detail-header-dark">
-                <div class="logo-mini"><i class="fas fa-shopping-bag"></i> ArdaShop.</div>
-                <i class="fas fa-times" onclick="closeDetail()" style="color: #888; font-size: 1.2rem; cursor: pointer;"></i>
-            </div>
-            
-            <div class="detail-scroll-area">
-                <img id="detail-img" class="detail-main-img" src="" alt="Produk">
-                <div class="thumbnail-container" id="thumbnail-container"></div>
-
-                <div class="detail-info">
-                    <div class="detail-title" id="detail-title">Nama Produk</div>
-                    <div class="detail-price" id="detail-price">Rp 0</div>
-                    
-                    <div class="variant-section" id="variant-section" style="display: none;">
-                        <div class="variant-title">Pilihan Warna/Tipe:</div>
-                        <div class="chip-container" id="chip-container"></div>
-                    </div>
-                    
-                    <div class="variant-title">Deskripsi:</div>
-                    <div class="desc-box" id="detail-desc"></div>
-                </div>
-            </div>
-
-            <div class="detail-footer">
-                <button class="btn-add-detail" id="btn-sticky-add" onclick="addToCartFromDetail()">
-                    Beli via WA
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast">Berhasil ditambahkan ke keranjang!</div>
+    <div class="section-title">Rekomendasi Terbaru</div>
+    <div class="product-grid" id="product-grid"></div>
 
     <script>
-        // MESIN SUPABASE (Key lu aman di sini)
-        const supabaseUrl = 'https://xrlulcclqvxnefohbigf.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybHVsY2NscXZ4bmVmb2hiaWdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNzQxMjgsImV4cCI6MjA5MzY1MDEyOH0.pa4U8fmC5I1DsWUpIGGA1gWiPXhxht76EWbRYsNxXS8'; 
-        const db = supabase.createClient(supabaseUrl, supabaseKey);
-        const nomorWA = '6281234567890'; // Jangan lupa ganti nomer WA lu
-
-        let products = [];
-        let cart = JSON.parse(localStorage.getItem('ardashop_cart')) || [];
-        let currentDetailProduct = null;
-        let selectedVariant = null;
-
-        // TARIK DATA
-        async function fetchProducts() {
-            const { data, error } = await db.from('inventory').select('*').eq('is_active', true).order('created_at', { ascending: false });
-            if (error) {
-                document.getElementById('loading-state').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:red; font-size:2rem;"></i><br><br>Gagal nyambung ke gudang.';
-                return;
-            }
-            products = data;
-            document.getElementById('loading-state').style.display = 'none';
-            document.getElementById('product-grid').style.display = 'grid';
-            
-            renderCategories();
-            renderProducts(products);
-            updateCartBadge();
-        }
-
-        // RENDER KATEGORI (Desain Kapsul)
+        const products = [ /* Data dummy nanti diganti Supabase */ ];
         function renderCategories() {
-            const catContainer = document.getElementById('category-container');
-            const categoriesMap = {};
-            
-            // Pemetaan icon cantik biar sesuai gambar lu
-            const iconSet = {
-                'Sayuran': 'fa-leaf', 'Elektronik': 'fa-tv', 'Furniture': 'fa-couch',
-                'Perabotan': 'fa-utensils', 'Sembako': 'fa-box'
-            };
-
-            products.forEach(p => { 
-                if (p.kategori && !categoriesMap[p.kategori]) {
-                    // Cari kata kunci di nama kategori biar iconnya nyambung
-                    let ic = 'fa-box-open';
-                    for(let k in iconSet) { if(p.kategori.toLowerCase().includes(k.toLowerCase())) ic = iconSet[k]; }
-                    categoriesMap[p.kategori] = ic;
-                }
-            });
-
-            catContainer.innerHTML = `<div class="cat-item active" onclick="filterData('Semua', this)"><i class="fas fa-store"></i><div class="cat-name">Semua</div></div>`;
-            for (const [catName, icon] of Object.entries(categoriesMap)) {
-                catContainer.innerHTML += `<div class="cat-item" onclick="filterData('${catName}', this)"><i class="fas ${icon}"></i><div class="cat-name">${catName}</div></div>`;
-            }
+            const list = [
+                {n: 'Semua', i: 'fa-store'}, {n: 'Elektronik', i: 'fa-tv'}, 
+                {n: 'Furniture', i: 'fa-couch'}, {n: 'Perabotan', i: 'fa-blender'}, 
+                {n: 'Sembako', i: 'fa-box-open'}
+            ];
+            document.getElementById('category-container').innerHTML = list.map(l => `
+                <div class="cat-item ${l.n === 'Semua' ? 'active' : ''}" onclick="filter(this, '${l.n}')">
+                    <i class="fas ${l.i}"></i><div class="cat-name">${l.n}</div>
+                </div>`).join('');
         }
-
-        function filterData(kategori, element) {
-            document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            const filtered = kategori === 'Semua' ? products : products.filter(p => p.kategori === kategori);
-            renderProducts(filtered);
+        function filter(el, n) {
+            document.querySelectorAll('.cat-item').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
         }
-
-        // RENDER PRODUK
-        function getImageUrl(item) {
-            let imgUrls = ['https://via.placeholder.com/400/ffffff/cccccc?text=No+Photo'];
-            try {
-                let parsed = typeof item.image_url === 'string' ? JSON.parse(item.image_url) : item.image_url;
-                if (Array.isArray(parsed) && parsed.length > 0) imgUrls = parsed;
-                else if (typeof item.image_url === 'string' && item.image_url.startsWith('http')) imgUrls = [item.image_url];
-            } catch(e) {}
-            return imgUrls;
-        }
-
-        function renderProducts(data) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-            if (data.length === 0) { grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 20px; color:#888;">Barang kosong.</div>'; return; }
-
-            data.forEach(p => {
-                const isHabis = p.stok <= 0;
-                const images = getImageUrl(p);
-                
-                grid.innerHTML += `
-                    <div class="card">
-                        <img src="${images[0]}" class="card-img" onclick="openDetail('${p.id}')">
-                        <div class="card-body">
-                            <div class="card-title" onclick="openDetail('${p.id}')">${p.nama}</div>
-                            <div class="card-price">Rp ${p.harga.toLocaleString('id-ID')}</div>
-                            <button class="btn-add-cart ${isHabis ? 'btn-habis' : ''}" ${isHabis ? 'disabled' : `onclick="openDetail('${p.id}')"`}>
-                                ${isHabis ? 'Habis' : 'Beli via WA'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // MODAL DETAIL (DARK)
-        function openDetail(id) {
-            const product = products.find(p => String(p.id) === String(id));
-            if (!product) return;
-            
-            currentDetailProduct = product;
-            selectedVariant = null;
-            const images = getImageUrl(product);
-
-            document.getElementById('detail-img').src = images[0];
-            document.getElementById('detail-price').innerText = `Rp ${product.harga.toLocaleString('id-ID')}`;
-            document.getElementById('detail-title').innerText = product.nama;
-            document.getElementById('detail-desc').innerText = product.deskripsi || "Barang bagus kualitas terjamin.";
-
-            const thumbContainer = document.getElementById('thumbnail-container');
-            thumbContainer.innerHTML = '';
-            images.forEach((url, idx) => {
-                thumbContainer.innerHTML += `<img class="thumbnail ${idx === 0 ? 'active' : ''}" src="${url}" onclick="changeThumb(this)">`;
-            });
-
-            const variantSection = document.getElementById('variant-section');
-            const chipContainer = document.getElementById('chip-container');
-            chipContainer.innerHTML = '';
-            
-            let variantList = [];
-            if (product.varian) {
-                try {
-                    let vData = typeof product.varian === 'string' ? JSON.parse(product.varian) : product.varian;
-                    if (typeof vData === 'object' && !Array.isArray(vData)) { variantList = [].concat(...Object.values(vData)); } 
-                    else if (Array.isArray(vData)) { variantList = vData; }
-                } catch(e) {}
-            }
-
-            if (variantList.length > 0) {
-                variantSection.style.display = 'block';
-                variantList.forEach((v, index) => {
-                    if(index === 0) selectedVariant = v;
-                    chipContainer.innerHTML += `<div class="chip ${index === 0 ? 'active' : ''}" onclick="selectVariant(this, '${v}')">${v}</div>`;
-                });
-            } else {
-                variantSection.style.display = 'none';
-            }
-
-            const btnSticky = document.getElementById('btn-sticky-add');
-            if (product.stok <= 0) {
-                btnSticky.style.background = '#555'; btnSticky.innerText = 'Stok Habis'; btnSticky.disabled = true;
-            } else {
-                btnSticky.style.background = 'var(--wa-green)'; btnSticky.innerText = 'Beli via WA'; btnSticky.disabled = false;
-            }
-
-            document.getElementById('detail-modal').style.display = 'flex';
-        }
-
-        function closeDetail() { document.getElementById('detail-modal').style.display = 'none'; }
-        
-        function selectVariant(element, v) {
-            document.querySelectorAll('#chip-container .chip').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            selectedVariant = v;
-        }
-
-        function changeThumb(element) {
-            document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('detail-img').src = element.src;
-        }
-
-        function addToCartFromDetail() {
-            if (!currentDetailProduct) return;
-            let namaFinal = currentDetailProduct.nama;
-            if (selectedVariant) namaFinal += ` (${selectedVariant})`;
-            addToCart(currentDetailProduct.id, namaFinal, currentDetailProduct.harga, selectedVariant);
-            closeDetail(); // Otomatis tutup pop-up abis masukin keranjang
-        }
-
-        // KERANJANG SYSTEM
-        function addToCart(id, nama, harga, varian = null) {
-            const cartId = varian ? `${id}-${varian}` : `${id}`;
-            const existingItem = cart.find(item => item.cartId === cartId);
-            if (existingItem) existingItem.qty += 1;
-            else cart.push({ cartId, id, nama, harga, qty: 1 });
-            saveCart(); showToast();
-        }
-
-        function removeCartItem(cartId) {
-            cart = cart.filter(item => item.cartId !== cartId);
-            saveCart(); renderCartModal();
-        }
-
-        function saveCart() { localStorage.setItem('ardashop_cart', JSON.stringify(cart)); updateCartBadge(); }
-
-        function updateCartBadge() {
-            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById('cart-count').innerText = totalItems;
-        }
-
-        function toggleCart() {
-            const modal = document.getElementById('cart-modal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-            if (modal.style.display === 'flex') renderCartModal();
-        }
-
-        function renderCartModal() {
-            const list = document.getElementById('cart-items-list');
-            const totalPriceEl = document.getElementById('cart-total-price');
-            let total = 0; list.innerHTML = '';
-
-            if (cart.length === 0) { list.innerHTML = '<p style="text-align:center; color:#888; padding: 20px 0;">Keranjang masih kosong.</p>'; totalPriceEl.innerText = '0'; return; }
-
-            cart.forEach(item => {
-                const subtotal = item.harga * item.qty;
-                total += subtotal;
-                list.innerHTML += `
-                    <div class="cart-item">
-                        <div style="flex: 1; padding-right: 10px;">
-                            <div style="font-size: 0.9rem; font-weight: bold; color: #333;">${item.nama}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-muted);">${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</div>
-                        </div>
-                        <div style="font-weight: 900; margin-right: 15px; font-size: 1rem; color: var(--primary);">Rp ${subtotal.toLocaleString('id-ID')}</div>
-                        <button class="hapus-item" onclick="removeCartItem('${item.cartId}')" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-            });
-            totalPriceEl.innerText = total.toLocaleString('id-ID');
-        }
-
-        function checkoutWA() {
-            if (cart.length === 0) return alert('Pilih barang dulu sebelum checkout, bro!');
-            let pesan = "Halo ArdaShop, saya mau pesan:\n\n";
-            let total = 0;
-
-            cart.forEach((item, index) => {
-                const subtotal = item.harga * item.qty;
-                total += subtotal;
-                pesan += `${index + 1}. *${item.nama}*\n   ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
-            });
-
-            pesan += `\n*TOTAL: Rp ${total.toLocaleString('id-ID')}*\n\nMohon diproses untuk pengiriman/COD ya.`;
-            const linkWA = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
-            cart = []; saveCart(); toggleCart(); window.open(linkWA, '_blank');
-        }
-
-        function showToast() {
-            const toast = document.getElementById("toast");
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-        }
-
-        // Close modal kalau klik di luar area
-        window.onclick = function(event) {
-            const cartModal = document.getElementById('cart-modal');
-            const detailModal = document.getElementById('detail-modal');
-            if (event.target == cartModal) cartModal.style.display = "none";
-            if (event.target == detailModal) detailModal.style.display = "none";
-        }
-
-        fetchProducts();
+        function toggleCart() { alert('Keranjang dibuka!'); }
+        renderCategories();
     </script>
 </body>
 </html>
