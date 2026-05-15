@@ -30,23 +30,27 @@
         .search-bar { flex: 1; background: rgba(255,255,255,0.95); padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; transition: 0.2s;}
         .search-bar:active { transform: scale(0.98); }
 
-        /* Banner Slider Auto-play (Sinkron & Modern) */
+        /* Banner Slider Auto-play */
         .banner-wrapper { position: relative; padding: 16px; background: var(--bg-surface); }
         .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; scrollbar-width: none; scroll-behavior: smooth; border-radius: 16px; }
         .banner-slider::-webkit-scrollbar { display: none; }
         
         .banner-slide { flex: 0 0 100%; scroll-snap-align: center; height: 160px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
         
+        /* INI KUNCI FIX-NYA: 
+           Semua gambar background dibungkus pakai div .banner-bg-container 
+           biar strukturnya sama persis kayak banner 1 yang berhasil.
+        */
+        .banner-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .banner-bg-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Khusus banner 1 yang dibagi 4 kolom */
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .grid-4 img { border-right: 1px solid rgba(255,255,255,0.1); }
+
         /* Overlay Gelap Halus Biar Teks Kebaca */
         .bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 100%); z-index: 1; }
         .slide-content { position: relative; z-index: 2; padding: 20px; color: #fff; }
-
-        /* Background Gambar Asli (Biar nggak ngeblank di HP) */
-        .img-bg-real { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
-
-        /* Trik Kolase Banner 1 (Kulkas, Sofa, Panci, Sayur) */
-        .collage-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(4, 1fr); z-index: 0; }
-        .collage-bg img { width: 100%; height: 100%; object-fit: cover; border-right: 1px solid rgba(255,255,255,0.1); }
 
         .slider-dots { position: absolute; bottom: 24px; left: 0; width: 100%; display: flex; justify-content: center; gap: 6px; pointer-events: none; z-index: 10;}
         .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; transition: 0.3s; }
@@ -139,7 +143,7 @@
         <div class="banner-slider" id="banner-slider">
             
             <div class="banner-slide">
-                <div class="collage-bg">
+                <div class="banner-bg-container grid-4">
                     <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80" alt="Grosir Sembako">
                     <img src="https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=300&q=80" alt="Elektronik Kulkas">
                     <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=300&q=80" alt="Furniture Sofa">
@@ -154,7 +158,9 @@
             </div>
 
             <div class="banner-slide">
-                <img src="https://images.unsplash.com/photo-1621217730104-368686d1ff5b?auto=format&fit=crop&w=800&q=80" class="img-bg-real" alt="Desa Asri">
+                <div class="banner-bg-container">
+                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80" alt="Desa Asri Pemandangan">
+                </div>
                 <div class="bg-overlay"></div>
                 <div class="slide-content">
                     <div style="background: #2ECC71; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; width: fit-content; margin-bottom: 8px;"><i class="fas fa-map-marker-alt"></i> DESA DIGITAL</div>
@@ -165,7 +171,9 @@
             </div>
 
             <div class="banner-slide">
-                <img src="https://images.unsplash.com/photo-1596728987413-5b8a531e2d78?auto=format&fit=crop&w=800&q=80" class="img-bg-real" alt="Kurir Pengiriman">
+                <div class="banner-bg-container">
+                    <img src="https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&w=800&q=80" alt="Kurir Pengiriman Motor">
+                </div>
                 <div class="bg-overlay"></div>
                 <div class="slide-content">
                     <div style="background: #3B82F6; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; width: fit-content; margin-bottom: 8px;"><i class="fas fa-truck-fast"></i> PENGIRIMAN AMAN</div>
@@ -243,7 +251,7 @@
         </div>
     </div>
 
-    <div id="toast"><i class="fas fa-check-circle" style="color: var(--wa-green); margin-right: 5px;"></i> Masuk ke keranjang!</div>
+    <div id="toast"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 5px;"></i> Masuk ke keranjang!</div>
 
     <script>
         const supabaseUrl = 'https://xrlulcclqvxnefohbigf.supabase.co';
