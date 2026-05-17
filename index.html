@@ -107,9 +107,40 @@
         .btn-checkout { background: var(--accent); color: #fff; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 1.05rem; cursor: pointer; display: flex; justify-content: center; gap: 8px; align-items: center; transition: 0.2s;}
         .btn-checkout:active { transform: scale(0.98); }
 
-        /* Modal Detail Produk */
+        /* ======== BARU: Modal Detail Produk Slider CSS ======== */
         .detail-scroll-area { overflow-y: auto; flex: 1; padding-bottom: 20px; }
-        .detail-main-img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #fff; border-bottom: 1px solid var(--border);}
+        
+        .detail-img-slider-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            background: #fff;
+            position: relative;
+        }
+        .detail-img-slider-container::-webkit-scrollbar { display: none; }
+        
+        .detail-img-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: contain;
+        }
+
+        .detail-slider-dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            background: #fff;
+        }
+        .detail-slider-dot {
+            width: 6px; height: 6px; background: #E2E8F0; border-radius: 50%; transition: 0.3s;
+        }
+        .detail-slider-dot.active { background: var(--primary); width: 18px; border-radius: 10px; }
+
         .detail-info { padding: 20px; }
         .detail-price { color: var(--accent); font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
         .detail-title { font-size: 1.1rem; font-weight: 600; color: var(--text-dark); margin-bottom: 16px; line-height: 1.4;}
@@ -136,7 +167,6 @@
 
     <div class="banner-wrapper">
         <div class="banner-slider" id="banner-slider">
-            
             <div class="banner-slide">
                 <div class="banner-bg-container grid-4">
                     <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80" alt="Grosir Sembako">
@@ -167,9 +197,7 @@
 
             <div class="banner-slide">
                 <div class="banner-bg-container">
-                    
                     <img src="https://images.unsplash.com/photo-1607227063002-677dc5fdf96f?auto=format&fit=crop&w=800&q=80" alt="Kurir Pengiriman">
-                    
                 </div>
                 <div class="bg-overlay"></div>
                 <div class="slide-content">
@@ -178,7 +206,6 @@
                     <p style="font-size: 0.85rem; font-weight: 500; opacity: 0.95;">Di antar sesuai lokasi dengan nyaman, aman.</p>
                 </div>
             </div>
-
         </div>
         
         <div class="slider-dots" id="slider-dots">
@@ -233,7 +260,13 @@
                 <i class="fas fa-times" onclick="closeDetail()" style="cursor:pointer; color: var(--text-muted); background: #F1F5F9; padding: 6px 10px; border-radius: 50%;"></i>
             </div>
             <div class="detail-scroll-area">
-                <img id="detail-img" class="detail-main-img" src="" alt="Produk">
+                
+                <div class="detail-img-slider-container" id="detail-img-slider">
+                    </div>
+                
+                <div class="detail-slider-dots-container" id="detail-slider-dots">
+                    </div>
+
                 <div class="detail-info">
                     <div class="detail-price" id="detail-price">Rp 0</div>
                     <div class="detail-title" id="detail-title">Nama Produk</div>
@@ -274,7 +307,6 @@
             slider.scrollBy({ left: dir * slider.clientWidth, behavior: 'smooth' });
         }
 
-        // Auto slide setiap 3.5 detik
         setInterval(() => {
             if (slideIndex >= dots.length - 1) {
                 slider.scrollTo({ left: 0, behavior: 'smooth' });
@@ -389,12 +421,44 @@
             });
         }
 
+        // ======== LOGIC BARU UNTUK RENDER BANYAK FOTO DI MODAL ========
         function openDetail(id) {
             const product = products.find(p => String(p.id) === String(id));
             if (!product) return;
             currentDetailProduct = product;
             
-            document.getElementById('detail-img').src = getImageUrl(product)[0];
+            // Ambil semua foto dari DB (Array)
+            const images = getImageUrl(product);
+            const sliderContainer = document.getElementById('detail-img-slider');
+            const dotsContainer = document.getElementById('detail-slider-dots');
+            
+            // Reset isi container
+            sliderContainer.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            // Inject gambar ke slider
+            images.forEach((imgUrl, index) => {
+                // Buat elemen gambar
+                sliderContainer.innerHTML += `<img src="${imgUrl}" class="detail-img-slide" alt="${product.nama} - Foto ${index+1}">`;
+                
+                // Buat dot indikator kalau gambar lebih dari 1
+                if (images.length > 1) {
+                    dotsContainer.innerHTML += `<span class="detail-slider-dot ${index === 0 ? 'active' : ''}"></span>`;
+                }
+            });
+
+            // Logic kalau gambarnya lebih dari 1, bikin dot-nya gerak pas diswipe
+            if (images.length > 1) {
+                dotsContainer.style.display = 'flex'; // Tunjukin dots
+                sliderContainer.onscroll = () => {
+                    let sIndex = Math.round(sliderContainer.scrollLeft / sliderContainer.clientWidth);
+                    let d = dotsContainer.querySelectorAll('.detail-slider-dot');
+                    d.forEach((dot, i) => dot.classList.toggle('active', i === sIndex));
+                };
+            } else {
+                dotsContainer.style.display = 'none'; // Sembunyiin dots kalau cuma 1 foto
+            }
+
             document.getElementById('detail-price').innerText = `Rp ${product.harga.toLocaleString('id-ID')}`;
             document.getElementById('detail-title').innerText = product.nama;
             document.getElementById('detail-desc').innerText = product.deskripsi || "Belum ada deskripsi untuk produk ini.";
@@ -410,6 +474,8 @@
                 btnBeli.classList.remove('btn-habis'); btnBeli.disabled = false; btnBeli.innerText = 'Beli Sekarang';
             }
             
+            // Reset scroll gambar ke ujung kiri tiap kali modal dibuka
+            sliderContainer.scrollLeft = 0; 
             document.getElementById('detail-modal').style.display = 'flex';
         }
 
