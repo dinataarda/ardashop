@@ -107,7 +107,7 @@
         .btn-checkout { background: var(--accent); color: #fff; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 1.05rem; cursor: pointer; display: flex; justify-content: center; gap: 8px; align-items: center; transition: 0.2s;}
         .btn-checkout:active { transform: scale(0.98); }
 
-        /* ======== BARU: Modal Detail Produk Slider CSS ======== */
+        /* Modal Detail Produk Slider CSS */
         .detail-scroll-area { overflow-y: auto; flex: 1; padding-bottom: 20px; }
         
         .detail-img-slider-container {
@@ -284,16 +284,17 @@
     <div id="toast"><i class="fas fa-check-circle" style="color: var(--wa-green); margin-right: 5px;"></i> Masuk ke keranjang!</div>
 
     <script>
-        const supabaseUrl = 'https://xrlulcclqvxnefohbigf.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhybHVsY2NscXZ4bmVmb2hiaWdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNzQxMjgsImV4cCI6MjA5MzY1MDEyOH0.pa4U8fmC5I1DsWUpIGGA1gWiPXhxht76EWbRYsNxXS8'; 
+        // KREDENSIAL SUPABASE BARU ADA DI SINI YAK
+        const supabaseUrl = 'https://qccabwegxnuqnngazwtj.supabase.co';
+        const supabaseKey = 'sb_publishable_b8I3P6I1RZLebQlzJMy0Mw_iEDpPOsy'; 
         const db = supabase.createClient(supabaseUrl, supabaseKey);
+        
         const nomorWA = '6281234567890'; 
 
         let products = [];
         let cart = JSON.parse(localStorage.getItem('ardashop_cart')) || [];
         let currentDetailProduct = null;
 
-        // --- FUNGSI SLIDER BANNER (AUTO PLAY) ---
         const slider = document.getElementById('banner-slider');
         const dots = document.querySelectorAll('.dot');
         let slideIndex = 0;
@@ -314,7 +315,6 @@
                 slideBanner(1);
             }
         }, 3500);
-        // ----------------------------
 
         function navTo(menu, element) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -336,6 +336,7 @@
             const { data, error } = await db.from('inventory').select('*').eq('is_active', true).order('created_at', { ascending: false });
             if (error) {
                 document.getElementById('loading-state').innerHTML = 'Gagal nyambung ke server.';
+                console.error(error);
                 return;
             }
             products = data;
@@ -421,42 +422,34 @@
             });
         }
 
-        // ======== LOGIC BARU UNTUK RENDER BANYAK FOTO DI MODAL ========
         function openDetail(id) {
             const product = products.find(p => String(p.id) === String(id));
             if (!product) return;
             currentDetailProduct = product;
             
-            // Ambil semua foto dari DB (Array)
             const images = getImageUrl(product);
             const sliderContainer = document.getElementById('detail-img-slider');
             const dotsContainer = document.getElementById('detail-slider-dots');
             
-            // Reset isi container
             sliderContainer.innerHTML = '';
             dotsContainer.innerHTML = '';
 
-            // Inject gambar ke slider
             images.forEach((imgUrl, index) => {
-                // Buat elemen gambar
                 sliderContainer.innerHTML += `<img src="${imgUrl}" class="detail-img-slide" alt="${product.nama} - Foto ${index+1}">`;
-                
-                // Buat dot indikator kalau gambar lebih dari 1
                 if (images.length > 1) {
                     dotsContainer.innerHTML += `<span class="detail-slider-dot ${index === 0 ? 'active' : ''}"></span>`;
                 }
             });
 
-            // Logic kalau gambarnya lebih dari 1, bikin dot-nya gerak pas diswipe
             if (images.length > 1) {
-                dotsContainer.style.display = 'flex'; // Tunjukin dots
+                dotsContainer.style.display = 'flex';
                 sliderContainer.onscroll = () => {
                     let sIndex = Math.round(sliderContainer.scrollLeft / sliderContainer.clientWidth);
                     let d = dotsContainer.querySelectorAll('.detail-slider-dot');
                     d.forEach((dot, i) => dot.classList.toggle('active', i === sIndex));
                 };
             } else {
-                dotsContainer.style.display = 'none'; // Sembunyiin dots kalau cuma 1 foto
+                dotsContainer.style.display = 'none';
             }
 
             document.getElementById('detail-price').innerText = `Rp ${product.harga.toLocaleString('id-ID')}`;
@@ -474,7 +467,6 @@
                 btnBeli.classList.remove('btn-habis'); btnBeli.disabled = false; btnBeli.innerText = 'Beli Sekarang';
             }
             
-            // Reset scroll gambar ke ujung kiri tiap kali modal dibuka
             sliderContainer.scrollLeft = 0; 
             document.getElementById('detail-modal').style.display = 'flex';
         }
@@ -564,7 +556,6 @@
             setTimeout(() => { toast.classList.remove("show"); }, 3000); 
         }
 
-        // Tutup modal kalau di-klik di luar area konten (gelap)
         window.onclick = function(event) {
             if (event.target == document.getElementById('cart-modal')) toggleCart();
             if (event.target == document.getElementById('detail-modal')) closeDetail();
