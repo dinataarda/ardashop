@@ -260,12 +260,8 @@
                 <i class="fas fa-times" onclick="closeDetail()" style="cursor:pointer; color: var(--text-muted); background: #F1F5F9; padding: 6px 10px; border-radius: 50%;"></i>
             </div>
             <div class="detail-scroll-area">
-                
-                <div class="detail-img-slider-container" id="detail-img-slider">
-                    </div>
-                
-                <div class="detail-slider-dots-container" id="detail-slider-dots">
-                    </div>
+                <div class="detail-img-slider-container" id="detail-img-slider"></div>
+                <div class="detail-slider-dots-container" id="detail-slider-dots"></div>
 
                 <div class="detail-info">
                     <div class="detail-price" id="detail-price">Rp 0</div>
@@ -284,9 +280,9 @@
     <div id="toast"><i class="fas fa-check-circle" style="color: var(--wa-green); margin-right: 5px;"></i> Masuk ke keranjang!</div>
 
     <script>
-        // KREDENSIAL SUPABASE BARU ADA DI SINI YAK
         const supabaseUrl = 'https://qccabwegxnuqnngazwtj.supabase.co';
-        const supabaseKey = 'sb_publishable_b8I3P6I1RZLebQlzJMy0Mw_iEDpPOsy'; 
+        // FIXED KEY (e kecil)
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjY2Fid2VneG51cW5uZ2F6d3RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwOTg2NzAsImV4cCI6MjA5NDY3NDY3MH0.OjiXel5NbxK7yN5l6jv2PWbPE42eD1W1pmkDKG87LFA'; 
         const db = supabase.createClient(supabaseUrl, supabaseKey);
         
         const nomorWA = '6281234567890'; 
@@ -537,6 +533,7 @@
             totalPriceEl.innerText = total.toLocaleString('id-ID');
         }
 
+        /* WA LINK FIX */
         function checkoutWA() {
             if (cart.length === 0) return alert('Pilih barang dulu bro!');
             let pesan = "Halo ArdaShop, saya mau pesan nih:\n\n"; let total = 0;
